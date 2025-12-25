@@ -42,14 +42,20 @@ public class ServiceTokenManager {
     }
 
     private String fetchAndCacheToken(String audience) {
-        ServiceTokenRequest request = new ServiceTokenRequest();
-        request.setClientId(secretsConfiguration.getChatService().getId());
-        request.setClientSecret(secretsConfiguration.getChatService().getPassword());
-        request.setAudience(audience);
 
-        ServiceTokenResponse response = authServiceClient.requestToken(request);
-        Instant expiry = Instant.now().plusSeconds(response.getExpiresIn() - 60);
-        tokenCache.storeToken(audience, response.getToken(), expiry);
-        return response.getToken();
+        try {
+            ServiceTokenRequest request = new ServiceTokenRequest();
+            request.setClientId(secretsConfiguration.getChatService().getId());
+            request.setClientSecret(secretsConfiguration.getChatService().getPassword());
+            request.setAudience(audience);
+            request.setScopes(serviceConfiguration.getUserService().getScopes());
+            ServiceTokenResponse response = authServiceClient.requestToken(request);
+            Instant expiry = Instant.now().plusSeconds(response.getExpiresIn() - 60);
+            tokenCache.storeToken(audience, response.getToken(), expiry);
+            return response.getToken();
+        } catch (Exception e) {
+            return null;
+        }
+
     }
 }

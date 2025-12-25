@@ -30,5 +30,6 @@ public class ServiceConfiguration {
     @Data
     public static class UserService {
         private String url;
+        List<String> scopes;
     }
 }
